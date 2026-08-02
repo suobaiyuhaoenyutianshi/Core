@@ -1,4 +1,4 @@
-#ifdef APP_BAT_H
+#ifndef APP_BAT_H
 #define APP_BAT_H
 #include "main.h"
 void APP_batInit();

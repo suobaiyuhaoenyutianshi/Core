@@ -18,13 +18,18 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "app_usart2.h"
+#include "stm32f1xx_hal_def.h"
 #include "stm32f1xx_hal_tim.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app_pwm.h"
+#include "app_bat.h"
+#include "stm32f1xx_hal_uart.h"
+#include <stdint.h>
+#include <string.h>
 /* USER CODE END Includes */
-
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
@@ -70,7 +75,7 @@ static void MX_TIM3_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+  float AAP;
 /* USER CODE END 0 */
 
 /**
@@ -79,16 +84,18 @@ static void MX_TIM3_Init(void);
   */
 int main(void)
 {
-
+  
   /* USER CODE BEGIN 1 */
 
-  /* USER CODE END 1 */
 
+  
+  /* USER CODE END 1 */
+  
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
+  
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -109,17 +116,32 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-
+  App_PWM_Init();
+  APP_batInit();
+  uint8_t x=3;
+  App_USART2_Printf("%d\n",x);
+  int temperature = 25;
+App_USART2_Printf("当前温度：%d°C\r\n", temperature);
+/*uint8_t TE[] = "holl";
+ uint8_t txData[] = "Hello, UART!\r\n";
+    uint16_t dataLen = sizeof(txData) - 1; // 不发送末尾的 '\0'
+     HAL_UART_Transmit(&huart2, txData, dataLen, HAL_MAX_DELAY);
+HAL_UART_Transmit(&huart2,TE,strlen(TE),HAL_MAX_DELAY);
+*/uint8_t data = '3';                   // 或 0x33
+HAL_UART_Transmit(&huart2, &data, 1, HAL_MAX_DELAY);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  App_PWM_Init();
-  App_PWM_Cmd(1);
-  App_PWM_Set_L(50.0);
-  App_PWM_Set_R(50.0);
+  
+  //App_PWM_Cmd(1);
+ // App_PWM_Set_L(50.0);
+  //App_PWM_Set_R(50.0);
   while (1)
   {
+    
+    App_Bat_Pro();
+    AAP =App_batGet();
     /* USER CODE END WHILE */
     
     /* USER CODE BEGIN 3 */
