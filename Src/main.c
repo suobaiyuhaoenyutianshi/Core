@@ -34,6 +34,8 @@
 #include "app_usart2.h"
 #include "app_bat.h"
 #include "app_pwm.h"
+#include "delay.h"
+#include "app_encoder.h"
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -117,19 +119,18 @@ int main(void)
   MX_USART2_UART_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+  Delay_Init();//别删这个
   App_PWM_Init();
   APP_batInit();
-  uint8_t x=3;
-  App_USART2_Printf("%d\n",x);
-  int temperature = 25;
-App_USART2_Printf("当前温度：%d°C\r\n", temperature);
+  App_Encoder_Init();
+  
+  
 /*uint8_t TE[] = "holl";
  uint8_t txData[] = "Hello, UART!\r\n";
     uint16_t dataLen = sizeof(txData) - 1; // 不发送末尾的 '\0'
      HAL_UART_Transmit(&huart2, txData, dataLen, HAL_MAX_DELAY);
 HAL_UART_Transmit(&huart2,TE,strlen(TE),HAL_MAX_DELAY);
-*/uint8_t data = '3';                   // 或 0x33
-HAL_UART_Transmit(&huart2, &data, 1, HAL_MAX_DELAY);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -141,20 +142,16 @@ HAL_UART_Transmit(&huart2, &data, 1, HAL_MAX_DELAY);
   while (1)
   {
     
-   /* App_Bat_Pro();
-    AAP =App_batGet();
-    uint32_t app = AAP*100;
-    uint32_t s = app/100;
-    uint32_t t = app%100;
-    App_USART2_Printf("%d.%02d\n",s,t);*/
-     // 启动一次 ADC 转换
-     App_Bat_Pro();
-    float voltage = App_batGet();
-    App_USART2_Printf("%0.2f\n",voltage);
-    //uint32_t v_int = (uint32_t)(voltage * 100);
-    //App_USART2_Printf("%d.%02d\n", v_int / 100, v_int % 100);
-    
-    HAL_Delay(500);  // 每 500ms 打印一次
+   
+    // App_Bat_Pro();
+    //float voltage = App_batGet();
+    ///App_USART2_Printf("%0.2f\n",voltage);
+    //HAL_Delay(500);  // 每 500ms 打印一次
+    uint64_t L_H = L_H_time();
+    uint64_t L_L = L_L_time();
+    uint64_t R_H = R_H_time();
+    uint64_t R_L = R_L_time();
+    App_USART2_Printf("%d,%d,%d,%d\n",L_H,L_L,R_H,R_L);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
