@@ -68,7 +68,9 @@ extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
 extern UART_HandleTypeDef huart2;
 /* USER CODE END Private defines */
+
 #ifdef __cplusplus
 }
 #endif
+
 #endif /* __MAIN_H */

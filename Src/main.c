@@ -18,21 +18,22 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "app_usart2.h"
-#include "stm32f1xx_hal_def.h"
-#include "stm32f1xx_hal_tim.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app_pwm.h"
 #include "app_bat.h"
+#include "stm32f1xx_hal_adc_ex.h"
 #include "stm32f1xx_hal_uart.h"
 #include <stdint.h>
 #include <string.h>
 /* USER CODE END Includes */
+
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+#include "app_usart2.h"
+#include "app_bat.h"
+#include "app_pwm.h"
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -84,18 +85,18 @@ static void MX_TIM3_Init(void);
   */
 int main(void)
 {
-  
+
   /* USER CODE BEGIN 1 */
 
 
   
   /* USER CODE END 1 */
-  
+
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-  
+
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -140,10 +141,22 @@ HAL_UART_Transmit(&huart2, &data, 1, HAL_MAX_DELAY);
   while (1)
   {
     
-    App_Bat_Pro();
+   /* App_Bat_Pro();
     AAP =App_batGet();
-    /* USER CODE END WHILE */
+    uint32_t app = AAP*100;
+    uint32_t s = app/100;
+    uint32_t t = app%100;
+    App_USART2_Printf("%d.%02d\n",s,t);*/
+     // 启动一次 ADC 转换
+     App_Bat_Pro();
+    float voltage = App_batGet();
+    App_USART2_Printf("%0.2f\n",voltage);
+    //uint32_t v_int = (uint32_t)(voltage * 100);
+    //App_USART2_Printf("%d.%02d\n", v_int / 100, v_int % 100);
     
+    HAL_Delay(500);  // 每 500ms 打印一次
+    /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -219,7 +232,7 @@ static void MX_ADC1_Init(void)
   hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
-  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.ExternalTrigConv = ADC_EXTERNALTRIGCONV_T3_TRGO;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.NbrOfConversion = 1;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
@@ -273,7 +286,7 @@ static void MX_I2C1_Init(void)
   /* USER CODE BEGIN I2C1_Init 2 */
     
   /* USER CODE END I2C1_Init 2 */
-  
+
 }
 
 /**
@@ -304,7 +317,7 @@ static void MX_TIM1_Init(void)
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim1) != HAL_OK)
-  { 
+  {
     Error_Handler();
   }
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
@@ -385,7 +398,7 @@ static void MX_TIM3_Init(void)
     Error_Handler();
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_ENABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
   {
     Error_Handler();
