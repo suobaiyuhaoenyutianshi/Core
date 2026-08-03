@@ -15,5 +15,9 @@ int  App_Encoder_EndCalibration(float *duty_l, float *duty_r);
     uint64_t L_L_time();
     uint64_t R_H_time();
     uint64_t R_L_time();
+   extern volatile uint32_t L_HIGTIM;
+extern volatile uint32_t L_LOWTIM;
+extern volatile uint32_t R_HIGTIM;
+extern volatile uint32_t R_LOWTIM;
 
 #endif

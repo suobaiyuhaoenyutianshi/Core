@@ -23,7 +23,10 @@
 /* USER CODE BEGIN Includes */
 #include "app_pwm.h"
 #include "app_bat.h"
+#include "button.h"
+#include "stm32f103xb.h"
 #include "stm32f1xx_hal_adc_ex.h"
+#include "stm32f1xx_hal_gpio.h"
 #include "stm32f1xx_hal_uart.h"
 #include <stdint.h>
 #include <string.h>
@@ -123,7 +126,10 @@ int main(void)
   App_PWM_Init();
   APP_batInit();
   App_Encoder_Init();
-  
+  Button_InitTypeDef butt;
+  butt.GPIOx = GPIOA;butt.GPIO_Pin =GPIO_PIN_11;
+  button_TypeDef Buutt; 
+  My_Button_Init(&Buutt,&butt);
   
 /*uint8_t TE[] = "holl";
  uint8_t txData[] = "Hello, UART!\r\n";
@@ -135,23 +141,24 @@ HAL_UART_Transmit(&huart2,TE,strlen(TE),HAL_MAX_DELAY);
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  
-  //App_PWM_Cmd(1);
- // App_PWM_Set_L(50.0);
-  //App_PWM_Set_R(50.0);
+  //App_Bat_Pro();
+  App_PWM_Cmd(1);
+ App_PWM_Set_R(70.0);
+  App_PWM_Set_L(50.0);
   while (1)
   {
     
-   
+    App_Bat_Pro();
+
     // App_Bat_Pro();
     //float voltage = App_batGet();
     ///App_USART2_Printf("%0.2f\n",voltage);
     //HAL_Delay(500);  // 每 500ms 打印一次
-    uint64_t L_H = L_H_time();
-    uint64_t L_L = L_L_time();
-    uint64_t R_H = R_H_time();
-    uint64_t R_L = R_L_time();
-    App_USART2_Printf("%d,%d,%d,%d\n",L_H,L_L,R_H,R_L);
+        HAL_Delay(500);
+
+    // 关中断安全读取（防止读一半被中断打断）
+    
+    
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -554,6 +561,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI3_IRQn);
+
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
