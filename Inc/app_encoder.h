@@ -11,10 +11,6 @@ float App_Encoder_GetSpeed_R(void);
 // 编码器占空比校准（如果你后面要做）
 void App_Encoder_StartCalibration(void);
 int  App_Encoder_EndCalibration(float *duty_l, float *duty_r);
-   uint64_t L_H_time();
-    uint64_t L_L_time();
-    uint64_t R_H_time();
-    uint64_t R_L_time();
    extern volatile uint32_t L_HIGTIM;
 extern volatile uint32_t L_LOWTIM;
 extern volatile uint32_t R_HIGTIM;
