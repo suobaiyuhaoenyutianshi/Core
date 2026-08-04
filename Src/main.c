@@ -130,7 +130,8 @@ int main(void)
   butt.GPIOx = GPIOA;butt.GPIO_Pin =GPIO_PIN_11;
   button_TypeDef Buutt; 
   My_Button_Init(&Buutt,&butt);
-  
+  App_PWM_Set_L(10);
+  App_PWM_Set_R(10);
 /*uint8_t TE[] = "holl";
  uint8_t txData[] = "Hello, UART!\r\n";
     uint16_t dataLen = sizeof(txData) - 1; // 不发送末尾的 '\0'
@@ -150,11 +151,14 @@ HAL_UART_Transmit(&huart2,TE,strlen(TE),HAL_MAX_DELAY);
     
     App_Bat_Pro();
 
-    // App_Bat_Pro();
-    //float voltage = App_batGet();
-    ///App_USART2_Printf("%0.2f\n",voltage);
-    //HAL_Delay(500);  // 每 500ms 打印一次
-        HAL_Delay(500);
+     HAL_Delay(500);
+
+    // 关中断安全读取（防止读一半被中断打断）
+    __disable_irq();
+ 
+    __enable_irq();
+
+    
 
     // 关中断安全读取（防止读一半被中断打断）
     

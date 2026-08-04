@@ -73,7 +73,7 @@ float App_Encoder_GetSpeed_L(void)
     float mo = dir * m_l[phase];
     float mNow = dir * m_l[next_ph];
     float M,T;
-    if (fabs(mo) * (t0 - t1) >fabs(mNow)*(now - t0)) {
+    if (fabs(mo) * (now - t0) >fabs(mNow)*(t0 - t1)) {
         M = mNow;
         T = (now - t0)*1.0e-6f;
     }else {
@@ -126,7 +126,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
    if (GPIO_Pin ==GPIO_PIN_14) {
         last_dir_l = dir_l;
         t1_l =t0_l;
-        t1_l = GetUs();
+        t0_l = GetUs();
         uint8_t A = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_14);
         uint8_t B = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_15);
         if (A) {
@@ -138,7 +138,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
             }    
         }else {
              phase_l = 0;
-            if (B )  { dir_l = 1;  encoder_l++; }
+            if (!B )  { dir_l = 1;  encoder_l++; }
             else                { dir_l = -1; encoder_l--; }
             
         }
@@ -148,7 +148,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
    }else if (GPIO_Pin == GPIO_PIN_3) {
       last_dir_r = dir_r;
         t1_r =t0_r;
-        t1_r = GetUs();
+        t0_r = GetUs();
         uint8_t A = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_3);
         uint8_t B = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_4);
         if (A) {
@@ -160,7 +160,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
             }    
         }else {
              phase_r = 0;
-            if (B )  { dir_r = 1;  encoder_l++; }
+            if (!B )  { dir_r = 1;  encoder_r++; }
             else                { dir_r = -1; encoder_r--; }
             
         }
