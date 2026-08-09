@@ -39,6 +39,8 @@
 #include "app_pwm.h"
 #include "delay.h"
 #include "app_encoder.h"
+#include "app_mpu6050.h"
+#include "mputest.h"
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -130,8 +132,7 @@ int main(void)
   butt.GPIOx = GPIOA;butt.GPIO_Pin =GPIO_PIN_11;
   button_TypeDef Buutt; 
   My_Button_Init(&Buutt,&butt);
-  App_PWM_Set_L(10);
-  App_PWM_Set_R(10);
+  
 /*uint8_t TE[] = "holl";
  uint8_t txData[] = "Hello, UART!\r\n";
     uint16_t dataLen = sizeof(txData) - 1; // 不发送末尾的 '\0'
@@ -144,15 +145,14 @@ HAL_UART_Transmit(&huart2,TE,strlen(TE),HAL_MAX_DELAY);
   /* USER CODE BEGIN WHILE */
   //App_Bat_Pro();
   App_PWM_Cmd(1);
- App_PWM_Set_R(70.0);
-  App_PWM_Set_L(50.0);
+  mputest();
   while (1)
   {
     
     App_Bat_Pro();
 
      HAL_Delay(500);
-
+    App_USART2_Printf("%.2f\n",App_Encoder_GetSpeed_R());
     // 关中断安全读取（防止读一半被中断打断）
     __disable_irq();
  
