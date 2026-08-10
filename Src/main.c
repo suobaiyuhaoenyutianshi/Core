@@ -145,7 +145,7 @@ HAL_UART_Transmit(&huart2,TE,strlen(TE),HAL_MAX_DELAY);
   /* USER CODE BEGIN WHILE */
   //App_Bat_Pro();
   App_PWM_Cmd(1);
-  mputest();
+  
   while (1)
   {
     
