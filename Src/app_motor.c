@@ -16,7 +16,7 @@ void App_Motor_Init(){
     PID_InitTypeDef init;
     init.Kp = 0.5f;
     init.Ki = 7.0f;
-    init.Kp=0.0f;
+    init.Kd=0.0f;
     init.Setpoint =0.0f;// 初始目标轮速 0 rad/s
     init.OutputUpperLimit = +8.4f;
     init.OutputLowerLimit = -8.4f;

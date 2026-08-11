@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "app_control.h"
 #include "app_pwm.h"
 #include "app_bat.h"
 #include "button.h"
@@ -41,6 +42,9 @@
 #include "app_encoder.h"
 #include "app_mpu6050.h"
 #include "mputest.h"
+#include "app_rc.h"
+#include "button.h"
+#include "app_motor.h"
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -63,6 +67,7 @@ TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
 
 UART_HandleTypeDef huart2;
+UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 
@@ -77,6 +82,7 @@ static void MX_TIM1_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_TIM3_Init(void);
+static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -123,11 +129,17 @@ int main(void)
   MX_TIM4_Init();
   MX_USART2_UART_Init();
   MX_TIM3_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
   Delay_Init();//别删这个
   App_PWM_Init();
   APP_batInit();
   App_Encoder_Init();
+  App_RC_Init();
+  APP_batInit();
+  App_RC_Init();
+  App_MPU6050_Init();
+
   Button_InitTypeDef butt;
   butt.GPIOx = GPIOA;butt.GPIO_Pin =GPIO_PIN_11;
   button_TypeDef Buutt; 
@@ -150,17 +162,15 @@ HAL_UART_Transmit(&huart2,TE,strlen(TE),HAL_MAX_DELAY);
   {
     
     App_Bat_Pro();
-
-     HAL_Delay(500);
-    App_USART2_Printf("%.2f\n",App_Encoder_GetSpeed_R());
-    // 关中断安全读取（防止读一半被中断打断）
-    __disable_irq();
- 
-    __enable_irq();
-
+    My_Button_Proc( &Buutt);
     
-
-    // 关中断安全读取（防止读一半被中断打断）
+    App_Motor_Proc();
+    App_MPU6050_Proc();
+    App_Control_Proc();
+   App_RC_Proc();
+  
+    
+    
     
     
     /* USER CODE END WHILE */
@@ -506,6 +516,39 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
+  * @brief USART3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART3_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART3_Init 0 */
+
+  /* USER CODE END USART3_Init 0 */
+
+  /* USER CODE BEGIN USART3_Init 1 */
+
+  /* USER CODE END USART3_Init 1 */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 9600;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_NONE;
+  huart3.Init.Mode = UART_MODE_TX_RX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART3_Init 2 */
+
+  /* USER CODE END USART3_Init 2 */
 
 }
 

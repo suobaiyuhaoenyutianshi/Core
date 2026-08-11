@@ -17,7 +17,7 @@ static float omega_ref = 0.0f;      // 积分得到的目标轮速 (rad/s)
 static PID_TypeDef pid_vel ;//速度环
 static PID_TypeDef pid_theta;//角度环
 static PID_TypeDef pid_theta_dot;//角速度环
-
+static PID_TypeDef pid_turn;
 
 
 
@@ -45,6 +45,8 @@ void App_Control_Init(void){
     init.OutputLowerLimit = -125.7f;
     init.DefaultOutput = 0.0f;
     PID_Init(&pid_theta_dot, &init);
+    init.Kp = 1.0f;init.Ki =0.0f;init.Kd =0;init.Setpoint = 0.0f;init.DefaultOutput =0.0f;init.OutputUpperLimit = 15.0f;init.OutputLowerLimit =-15.0f;
+    PID_Init(&pid_turn,&init);
 }
 /**
  * @brief  平衡车控制主进程（串级 PID 核心）
@@ -83,19 +85,21 @@ void App_Control_Proc(void){
     float the_ref = qatan(acc_ref/g);
     // ===== 5. 角度环 PID：倾角误差 → 目标角速度 =====
     PID_ChangeSetpoint(&pid_theta,the_ref);
-    float the_dot_tef = PID_Compute1(&pid_theta,the_ref,now);
+    float the_dot_tef = PID_Compute1(&pid_theta,theta,now);
     // ===== 6. 角速度环 PID：角速度误差 → 目标角加速度 =====
     PID_ChangeSetpoint(&pid_theta_dot,the_dot_tef);
-    float the_dot_dot_ref = PID_Compute1(&pid_theta_dot,the_dot_tef,now);
+    float the_dot_dot_ref = PID_Compute1(&pid_theta_dot,theta_dot,now);
     // ===== 7. 逆解算：角加速度 → 车轮线加速度 =====
     // 根据倒立摆动力学：车轮加速度 x_dot_dot = (g*sinθ - θ_dot_dot * lp) / cosθ
     float x_dot_dot_ref = (g * qsin(theta) - the_dot_dot_ref * lp) / qcos(theta);
     if (lasttime!=0) {
-        omega_ref = (1.0f / rw) * x_dot_dot_ref * deltaT;
+        omega_ref += (1.0f / rw) * x_dot_dot_ref * deltaT;
     }
+    float gz = App_MPU6050_GetGz()*0.0174533f;
+    float om_dif    =  PID_Compute1(&pid_turn,gz,now) ;
      // ===== 9. 将目标轮速发给电机速度环 =====
-    App_Motor_SetOmega_L(omega_ref);
-    App_Motor_SetOmega_R(omega_ref);
+    App_Motor_SetOmega_L(omega_ref-om_dif);
+    App_Motor_SetOmega_R(omega_ref+om_dif);
 
     lasttime = now; // 保存本次时间戳
 
@@ -113,3 +117,9 @@ void App_Control_Reset(void)
     PID_Reset(&pid_theta_dot);
 }
 
+void App_Contro_setMoveSpeed(float speed){
+    PID_ChangeSetpoint(&pid_vel,speed);
+}
+void App_Contro_setTurnSpeed(float speed){
+    PID_ChangeSetpoint(&pid_turn,speed);
+}
