@@ -90,23 +90,25 @@ static void MX_USART3_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
   float AAP;
+  volatile float test_var = 3.14f; 
 /* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
   * @retval int
   */
+ volatile uint64_t a = 7;
 int main(void)
 {
 
   /* USER CODE BEGIN 1 */
 
-
+  if (a > 0) { AAP = 1.0f; }
   
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
-
+  
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
@@ -156,8 +158,9 @@ HAL_UART_Transmit(&huart2,TE,strlen(TE),HAL_MAX_DELAY);
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   //App_Bat_Pro();
-  App_PWM_Cmd(1);
   
+  App_PWM_Cmd(1);
+  mputest(&a);
   while (1)
   {
     
