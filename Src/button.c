@@ -11,7 +11,7 @@ void My_Button_Init(button_TypeDef * Bin,Button_InitTypeDef* inIt){
     Bin->state = 0;
     Bin->clickcb =NULL;
     Bin->longPressCb =NULL;
-}
+}//
 void My_Button_SetClickCb(button_TypeDef *btn, Button_clickback cb){
     btn->clickcb =cb;
 }
